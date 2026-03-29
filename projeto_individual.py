@@ -24,3 +24,21 @@ def avancar_esquerda(blocos, inicio):
 
 print(avancar_direita(blocos, 0))
 print(avancar_esquerda(blocos, 3))
+
+def solucao(blocos):
+    maior_distancia = 0  # guarda a maior distância encontrada, começa em 0 porque ainda não testámos nada
+    
+    for i in range(len(blocos)):  # testa cada bloco como ponto de partida e avança para ambos os lados
+        direita = avancar_direita(blocos, i)
+        esquerda = avancar_esquerda(blocos, i)
+        distancia = direita - esquerda  # diferença entre as posições finais dos dois sapos
+        
+        if distancia > maior_distancia:  # se esta distância for maior que a melhor até agora, actualiza
+            maior_distancia = distancia
+    
+    return maior_distancia
+
+print(solucao(blocos))
+
+blocos = [1, 5, 5, 2, 6]
+print(solucao(blocos))
