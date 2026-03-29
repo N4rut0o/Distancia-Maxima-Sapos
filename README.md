@@ -17,8 +17,8 @@ sapos conseguem ficar.
 
 ### Base obrigatória
 - [x] movimento básico dos sapos
-- [ ] função solucao(blocos)
-- [ ] funcionar para qualquer lista de blocos
+- [x] função solucao(blocos)
+- [x] funcionar para qualquer lista de blocos
 - [ ] pelo menos 5 testes com tempo de execução
 
 ### Extras do enunciado
