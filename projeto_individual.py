@@ -70,9 +70,12 @@ for blocos, valor_esperado in testes:
     print(f"Valor esperado: {valor_esperado}")
     print(f"tempo: {tempo_execucao:.5f}s")
     
+    # Gráfico dos blocos (dentro do For para gerar gráfico de cada um)
+    serie_blocos = pd.Series(blocos)
+    serie_blocos.plot(kind="bar")
+    plt.title(f"Blocos: {blocos}")
+    plt.xlabel("Posição") 
+    plt.ylabel("Altura")
+    plt.show()    
 
-# Gráfico dos blocos
-serie_blocos = pd.Series(blocos)
-serie_blocos.plot(kind="bar")
-plt.title(f"Blocos: {blocos}")
-plt.show()
+# interface gráfica simples criada
