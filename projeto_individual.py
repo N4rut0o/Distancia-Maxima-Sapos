@@ -30,7 +30,7 @@ def avancar_esquerda(blocos, inicio):
 
 def solucao(blocos):
     maior_distancia = 0  # guarda a maior distância encontrada, começa em 0 porque ainda não testámos nada
-    
+    partida = 0 # variável criada para ficarmos com o ponto de partida de cada sapo
     for i in range(len(blocos)):  # testa cada bloco como ponto de partida e avança para ambos os lados
         direita = avancar_direita(blocos, i)
         esquerda = avancar_esquerda(blocos, i)
@@ -38,8 +38,9 @@ def solucao(blocos):
         
         if distancia > maior_distancia:  # se esta distância for maior que a melhor até agora, actualiza
             maior_distancia = distancia
+            partida = i # guarda o bloco de partida correspondente
     
-    return maior_distancia
+    return maior_distancia, partida
 
 
 # Testes
@@ -61,7 +62,7 @@ testes = [
 for blocos, valor_esperado in testes:
     
     inicio = time.perf_counter() # utilizar o time.perf_counter para o início da contagem
-    distancia = solucao(blocos) # distância máxima encontrada / colacada entre inicio e fim para ser cronometrada
+    distancia, partida = solucao(blocos) # distância máxima encontrada / colacada entre inicio e fim para ser cronometrada
     fim = time.perf_counter() # mesma lógica do inicio mas para o termino da contagem 
     tempo_execucao = fim - inicio  # tempo total de execução
     
@@ -70,12 +71,18 @@ for blocos, valor_esperado in testes:
     print(f"Valor esperado: {valor_esperado}")
     print(f"tempo: {tempo_execucao:.5f}s")
     
-    # Gráfico dos blocos (dentro do For para gerar gráfico de cada um)
-    serie_blocos = pd.Series(blocos)
-    serie_blocos.plot(kind="bar")
-    plt.title(f"Blocos: {blocos}")
-    plt.xlabel("Posição") 
-    plt.ylabel("Altura")
-    plt.show()    
+    # Gráfico com sapos coloridos por posição
+    esquerda = avancar_esquerda(blocos, partida)
+    direita  = avancar_direita(blocos, partida)
 
-# interface gráfica simples criada
+    # cores para identificar visualmente as posições do sapo no gráfico
+    cores = ["gray"] * len(blocos)
+    cores[esquerda] = "green"   
+    cores[partida]  = "blue"    
+    cores[direita]  = "red"     
+
+    pd.Series(blocos).plot(kind="bar", color=cores)
+    plt.title(f"Blocos: {blocos} | Distância: {distancia}")
+    plt.xlabel("Posição")
+    plt.ylabel("Altura")
+    plt.show()
