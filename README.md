@@ -25,7 +25,7 @@ sapos conseguem ficar.
 - [ ] mais de 2 sapos
 - [ ] custo de salto
 - [ ] deixar descer um pouco (tolerância)
-- [ ] interface gráfica
+- [x] interface gráfica (Em desenvolvimento!)
 
 ### Extras por iniciativa própria
 - [ ] menu interativo
