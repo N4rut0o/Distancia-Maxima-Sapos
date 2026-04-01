@@ -19,7 +19,7 @@ sapos conseguem ficar.
 - [x] movimento básico dos sapos
 - [x] função solucao(blocos)
 - [x] funcionar para qualquer lista de blocos
-- [ ] pelo menos 5 testes com tempo de execução
+- [x] pelo menos 5 testes com tempo de execução
 
 ### Extras do enunciado
 - [ ] mais de 2 sapos
