@@ -5,6 +5,8 @@ Created on Sat Mar 21 18:35:05 2026
 @author: Filipe
 """
 
+# Imports
+import time
 
 #Funções
 def avancar_direita(blocos, inicio):
@@ -54,9 +56,15 @@ testes = [
 
 # Executa cada teste e compara com o valor esperado
 for blocos, valor_esperado in testes:
-
-    distância = solucao(blocos) # distância máxima encontrada
     
-    print("Blocos:", blocos)
-    print("Distância:", distância)
-    print("Valor esperado:", valor_esperado)
+    inicio = time.perf_counter() # utilizar o time.perf_counter para o início da contagem
+    distancia = solucao(blocos) # distância máxima encontrada / colacada entre inicio e fim para ser cronometrada
+    fim = time.perf_counter() # mesma lógica do inicio mas para o termino da contagem 
+    tempo_execucao = fim - inicio  # tempo total de execução
+    
+    print(f"Blocos: {blocos}")
+    print(f"Distância: {distancia}")
+    print(f"Valor esperado: {valor_esperado}")
+    print(f"tempo: {tempo_execucao:.5f}s")
+    
+# todos os testes passaram!
