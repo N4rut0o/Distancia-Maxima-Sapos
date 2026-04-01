@@ -7,8 +7,11 @@ Created on Sat Mar 21 18:35:05 2026
 
 # Imports
 import time
+import pandas as pd
+import matplotlib.pyplot as plt
 
-#Funções
+
+# Funções
 def avancar_direita(blocos, inicio):
     posicao = inicio # copia o valor de inicio para posicao
     # só avança se existir um bloco à frente e se esse bloco for acessível
@@ -39,7 +42,7 @@ def solucao(blocos):
     return maior_distancia
 
 
-#Testes
+# Testes
 
 # bloco inicial dado
 blocos = [2,6,8,5] 
@@ -67,4 +70,9 @@ for blocos, valor_esperado in testes:
     print(f"Valor esperado: {valor_esperado}")
     print(f"tempo: {tempo_execucao:.5f}s")
     
-# todos os testes passaram!
+
+# Gráfico dos blocos
+serie_blocos = pd.Series(blocos)
+serie_blocos.plot(kind="bar")
+plt.title(f"Blocos: {blocos}")
+plt.show()
