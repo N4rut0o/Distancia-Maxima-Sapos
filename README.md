@@ -29,7 +29,7 @@ sapos conseguem ficar.
 
 ### Extras por iniciativa própria
 - [ ] menu interativo
-- [ ] análise estatística com pandas
+- [x] análise estatística com pandas (Em desenvolvimento)
 - [ ] gráfico comparativo 
 - [ ] sliders interativos
 - [ ] barra de progresso para listas grandes
