@@ -50,11 +50,31 @@ def classificar_tempo(tempo):
     else:
         return "Lento"
 
+    
+# Função para mostrar os sapos coloridos por posição - com objetivode ser reutilizada ao implementar menu
+def mostrar_grafico(blocos):
+    distancia, partida = solucao(blocos)
+    esquerda = avancar_esquerda(blocos, partida)
+    direita  = avancar_direita(blocos, partida)
+    
+    # cores para identificar visualmente as posições do sapo no gráfico
+    cores = ["gray"] * len(blocos)
+    cores[esquerda] = "green"   
+    cores[partida]  = "blue"    
+    cores[direita]  = "red"     
+
+    pd.Series(blocos).plot(kind="bar", color=cores)
+    plt.title(f"Blocos: {blocos} | Distância: {distancia}")
+    plt.xlabel("Posição")
+    plt.ylabel("Altura")
+    plt.show()    
+
 # Testes
 
 # bloco inicial dado
 blocos = [2,6,8,5] 
-print(solucao(blocos))
+distancia, partida = solucao(blocos)
+print(f"Distância: {distancia} | Partida: bloco {partida}")
 
 # bloco de 5 testes criado (2 do enunciado, 3 aleatórios)
 testes = [
@@ -90,23 +110,11 @@ for blocos, valor_esperado in testes:
         "tempo"         : tempo_execucao
     })
     
-    # Gráfico com sapos coloridos por posição
-    esquerda = avancar_esquerda(blocos, partida)
-    direita  = avancar_direita(blocos, partida)
-
-    # cores para identificar visualmente as posições do sapo no gráfico
-    cores = ["gray"] * len(blocos)
-    cores[esquerda] = "green"   
-    cores[partida]  = "blue"    
-    cores[direita]  = "red"     
-
-    pd.Series(blocos).plot(kind="bar", color=cores)
-    plt.title(f"Blocos: {blocos} | Distância: {distancia}")
-    plt.xlabel("Posição")
-    plt.ylabel("Altura")
-    plt.show()
-
+    
 # Análise dos resultados com pandas
 df_resultados = pd.DataFrame(resultados)
 df_resultados["Tempo de Execução"] = df_resultados["tempo"].apply(classificar_tempo)
 print(df_resultados)
+
+# Utilizar função para mostrar gráfico de bloco específico
+mostrar_grafico([2, 6, 8, 5])
