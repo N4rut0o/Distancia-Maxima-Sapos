@@ -42,6 +42,13 @@ def solucao(blocos):
     
     return maior_distancia, partida
 
+def classificar_tempo(tempo):
+    if tempo < 0.000004:
+        return "Rápido"
+    elif tempo < 0.000005:
+        return "Normal"
+    else:
+        return "Lento"
 
 # Testes
 
@@ -58,6 +65,9 @@ testes = [
         ([1,2,3,4,5], 4),
         ]
 
+# Lista
+resultados = []  # lista para guardar os resultados de cada teste
+
 # Executa cada teste e compara com o valor esperado
 for blocos, valor_esperado in testes:
     
@@ -70,6 +80,15 @@ for blocos, valor_esperado in testes:
     print(f"Distância: {distancia}")
     print(f"Valor esperado: {valor_esperado}")
     print(f"tempo: {tempo_execucao:.5f}s")
+    
+    # guarda os resultados do teste atual
+    resultados.append({
+        "blocos"        : str(blocos),
+        "distancia"     : distancia,
+        "valor_esperado": valor_esperado,
+        "correto"       : distancia == valor_esperado,
+        "tempo"         : tempo_execucao
+    })
     
     # Gráfico com sapos coloridos por posição
     esquerda = avancar_esquerda(blocos, partida)
@@ -86,3 +105,8 @@ for blocos, valor_esperado in testes:
     plt.xlabel("Posição")
     plt.ylabel("Altura")
     plt.show()
+
+# Análise dos resultados com pandas
+df_resultados = pd.DataFrame(resultados)
+df_resultados["Tempo de Execução"] = df_resultados["tempo"].apply(classificar_tempo)
+print(df_resultados)
