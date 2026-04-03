@@ -49,7 +49,6 @@ def classificar_tempo(tempo):
         return "Normal"
     else:
         return "Lento"
-
     
 # Função para mostrar os sapos coloridos por posição - com objetivode ser reutilizada ao implementar menu
 def mostrar_grafico(blocos):
@@ -67,7 +66,92 @@ def mostrar_grafico(blocos):
     plt.title(f"Blocos: {blocos} | Distância: {distancia}")
     plt.xlabel("Posição")
     plt.ylabel("Altura")
-    plt.show()    
+    plt.show()  
+    
+def ler_blocos():
+    resposta = input("Introduza os blocos: ")
+    blocos = list(map(int, resposta.split()))
+    return blocos 
+
+# código movido para uma função para ser utilizado através do Menu
+def correr_testes():
+    
+    # bloco de 5 testes criado (2 do enunciado, 3 aleatórios)
+    testes = [
+            ([2,6,8,5], 2),
+            ([1,5,5,2,6], 3),
+            ([1,1,1,1], 3),
+            ([5,4,3,2,1], 4),
+            ([1,2,3,4,5], 4),
+            ]
+
+    # Lista para guardar os resultados de cada teste
+    resultados = []  # lista para guardar os resultados de cada teste
+
+    # Executa cada teste e compara com o valor esperado
+    for blocos, valor_esperado in testes:
+        
+        inicio = time.perf_counter() # utilizar o time.perf_counter para o início da contagem
+        distancia, partida = solucao(blocos) # distância máxima encontrada / colacada entre inicio e fim para ser cronometrada
+        fim = time.perf_counter() # mesma lógica do inicio mas para o termino da contagem 
+        tempo_execucao = fim - inicio  # tempo total de execução
+        
+        print(f"Blocos: {blocos}")
+        print(f"Distância: {distancia}")
+        print(f"Valor esperado: {valor_esperado}")
+        print(f"tempo: {tempo_execucao:.5f}s")
+        
+        # guarda os resultados do teste atual
+        resultados.append({
+            "blocos"        : str(blocos),
+            "distancia"     : distancia,
+            "valor_esperado": valor_esperado,
+            "correto"       : distancia == valor_esperado,
+            "tempo"         : tempo_execucao
+        })
+        
+        
+    # Análise dos resultados com pandas
+    df_resultados = pd.DataFrame(resultados)
+    df_resultados["Tempo de Execução"] = df_resultados["tempo"].apply(classificar_tempo)
+    print(df_resultados)
+
+    
+# Menu
+def menu():
+    
+    while True:
+        print("        -- PROBLEMA DOS SAPOS --          ")
+        print("             --- Base ---             ")
+        print("  1) Inserir blocos                   ")
+        print("  2) Correr testes                    ")
+        print("  3) Mostrar gráfico                  ")
+        print("  0) Sair                             ")
+        print("\n" )
+
+        escolha = input("Opção: ").strip()
+
+        if escolha == "1":
+            blocos = ler_blocos()
+            distancia, partida = solucao(blocos)
+            print(f"\nDistância: {distancia} | Partida: bloco {partida}")
+            print("\n" )   
+
+        elif escolha == "2":
+            correr_testes()
+
+        elif escolha == "3":
+            blocos = ler_blocos()
+            mostrar_grafico(blocos)
+            print("\n" )   
+
+        elif escolha == "0":
+            print("Até logo! 🐸")
+            break
+
+        else:
+            print("Opção inválida.")
+
 
 # Testes
 
@@ -76,45 +160,9 @@ blocos = [2,6,8,5]
 distancia, partida = solucao(blocos)
 print(f"Distância: {distancia} | Partida: bloco {partida}")
 
-# bloco de 5 testes criado (2 do enunciado, 3 aleatórios)
-testes = [
-        ([2,6,8,5], 2),
-        ([1,5,5,2,6], 3),
-        ([1,1,1,1], 3),
-        ([5,4,3,2,1], 4),
-        ([1,2,3,4,5], 4),
-        ]
-
-# Lista
-resultados = []  # lista para guardar os resultados de cada teste
-
-# Executa cada teste e compara com o valor esperado
-for blocos, valor_esperado in testes:
-    
-    inicio = time.perf_counter() # utilizar o time.perf_counter para o início da contagem
-    distancia, partida = solucao(blocos) # distância máxima encontrada / colacada entre inicio e fim para ser cronometrada
-    fim = time.perf_counter() # mesma lógica do inicio mas para o termino da contagem 
-    tempo_execucao = fim - inicio  # tempo total de execução
-    
-    print(f"Blocos: {blocos}")
-    print(f"Distância: {distancia}")
-    print(f"Valor esperado: {valor_esperado}")
-    print(f"tempo: {tempo_execucao:.5f}s")
-    
-    # guarda os resultados do teste atual
-    resultados.append({
-        "blocos"        : str(blocos),
-        "distancia"     : distancia,
-        "valor_esperado": valor_esperado,
-        "correto"       : distancia == valor_esperado,
-        "tempo"         : tempo_execucao
-    })
-    
-    
-# Análise dos resultados com pandas
-df_resultados = pd.DataFrame(resultados)
-df_resultados["Tempo de Execução"] = df_resultados["tempo"].apply(classificar_tempo)
-print(df_resultados)
 
 # Utilizar função para mostrar gráfico de bloco específico
 mostrar_grafico([2, 6, 8, 5])
+# Chamar função Menu para utilizador usar
+menu()
+
