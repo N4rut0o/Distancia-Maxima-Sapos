@@ -25,10 +25,10 @@ sapos conseguem ficar.
 - [ ] mais de 2 sapos
 - [ ] custo de salto
 - [ ] deixar descer um pouco (tolerância)
-- [x] interface gráfica (Em desenvolvimento!)
+- [x] interface gráfica 
 
 ### Extras por iniciativa própria
-- [ ] menu interativo
+- [x] menu interativo
 - [x] análise estatística com pandas (Em desenvolvimento)
 - [ ] gráfico comparativo 
 - [ ] sliders interativos
