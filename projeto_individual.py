@@ -35,12 +35,32 @@ def solucao(blocos):
     if len(blocos) == 0:
         return 0, 0
     
+    n = len(blocos) # guardar numa variável o tamanho para depois percorrer no ciclo
+    
+    # para cada bloco, guarda até onde o sapo consegue ir para a esquerda
+    esquerda = [0] * n
+    esquerda[0] = 0
+    for i in range(1, n):
+        if blocos[i - 1] >= blocos[i]:
+            esquerda[i] = esquerda[i - 1]
+        else:
+            esquerda[i] = i
+    
+    # para cada bloco, guarda até onde o sapo consegue ir para a direita
+    direita = [0] * n
+    direita[n - 1] = n - 1
+    for i in range(n - 2, -1, -1):
+        if blocos[i + 1] >= blocos[i]:
+            direita[i] = direita[i + 1]
+        else:
+            direita[i] = i
+    
     maior_distancia = 0  # guarda a maior distância encontrada, começa em 0 porque ainda não testámos nada
     partida = 0 # variável criada para ficarmos com o ponto de partida de cada sapo
-    for i in range(len(blocos)):  # testa cada bloco como ponto de partida e avança para ambos os lados
-        direita = avancar_direita(blocos, i)
-        esquerda = avancar_esquerda(blocos, i)
-        distancia = direita - esquerda  # diferença entre as posições finais dos dois sapos
+    
+    # percorre todos os blocos e encontra qual dá a maior distância
+    for i in range(n):  
+        distancia = direita[i] - esquerda[i]  # diferença entre as posições finais dos dois sapos
         
         if distancia > maior_distancia:  # se esta distância for maior que a melhor até agora, actualiza
             maior_distancia = distancia
@@ -126,18 +146,9 @@ def correr_testes():
     print("\\n")
     blocos_grandes = list(range(1, 100001))
     inicio = time.perf_counter()
-
-    maior_distancia = 0
-    for i in tqdm(range(len(blocos_grandes))):
-        direita = avancar_direita(blocos_grandes, i)
-        esquerda = avancar_esquerda(blocos_grandes, i)
-        distancia = direita - esquerda
-        
-        if distancia > maior_distancia:
-            maior_distancia = distancia
-
+    distancia, partida = solucao(blocos_grandes)
     fim = time.perf_counter()
-    print(f"100 000 blocos | Distância: {maior_distancia} | Tempo: {fim - inicio:.5f}s")
+    print(f"10⁵ blocos | Distância: {distancia} | Tempo: {fim - inicio:.5f}s")
 
     
 # Menu
