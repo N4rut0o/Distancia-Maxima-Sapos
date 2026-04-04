@@ -32,5 +32,5 @@ sapos conseguem ficar.
 - [x] análise estatística com pandas (Em desenvolvimento)
 - [ ] gráfico comparativo 
 - [ ] sliders interativos
-- [ ] barra de progresso para listas grandes
+- [x] barra de progresso para listas grandes (Utilizada nos testes de uma lista de 10⁵ blocos)
 - [ ] modo jogo com HP (cada salto custa vida)
