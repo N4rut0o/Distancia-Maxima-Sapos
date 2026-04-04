@@ -29,6 +29,11 @@ def avancar_esquerda(blocos, inicio):
 
 
 def solucao(blocos):
+    
+    # protecção para lista vazia — retorna 0 em vez de crashar
+    if len(blocos) == 0:
+        return 0, 0
+    
     maior_distancia = 0  # guarda a maior distância encontrada, começa em 0 porque ainda não testámos nada
     partida = 0 # variável criada para ficarmos com o ponto de partida de cada sapo
     for i in range(len(blocos)):  # testa cada bloco como ponto de partida e avança para ambos os lados
@@ -151,7 +156,7 @@ def menu():
 
         else:
             print("Opção inválida.")
-
+            
 
 # Testes
 
@@ -160,9 +165,16 @@ blocos = [2,6,8,5]
 distancia, partida = solucao(blocos)
 print(f"Distância: {distancia} | Partida: bloco {partida}")
 
+# testes de casos limite para verificar se programa não crasha
+distancia, partida = solucao([1])  # um único bloco, ou seja, o sapo não se pode mover
+print(f"1 bloco: distância {distancia}") 
 
-# Utilizar função para mostrar gráfico de bloco específico
-mostrar_grafico([2, 6, 8, 5])
+distancia, partida = solucao([1, 1]) # dois blocos iguais, conseguem separar-se 1 posição
+print(f"2 blocos iguais: distância {distancia}")
+
+distancia, partida = solucao([]) # lista vazia — não deveria crashar 
+print(f"lista vazia: distância {distancia}")
+      
 # Chamar função Menu para utilizador usar
 menu()
 
