@@ -9,6 +9,7 @@ Created on Sat Mar 21 18:35:05 2026
 import time
 import pandas as pd
 import matplotlib.pyplot as plt
+from tqdm import tqdm # barra de progresso para visualizar teste da questão "10⁵ blocos?"
 
 
 # Funções
@@ -120,6 +121,23 @@ def correr_testes():
     df_resultados = pd.DataFrame(resultados)
     df_resultados["Tempo de Execução"] = df_resultados["tempo"].apply(classificar_tempo)
     print(df_resultados)
+    
+    # teste com lista grande para responder à questão do enunciado "o que aconteceria com uma lista de 10⁵ blocos?"
+    print("\\n")
+    blocos_grandes = list(range(1, 100001))
+    inicio = time.perf_counter()
+
+    maior_distancia = 0
+    for i in tqdm(range(len(blocos_grandes))):
+        direita = avancar_direita(blocos_grandes, i)
+        esquerda = avancar_esquerda(blocos_grandes, i)
+        distancia = direita - esquerda
+        
+        if distancia > maior_distancia:
+            maior_distancia = distancia
+
+    fim = time.perf_counter()
+    print(f"100 000 blocos | Distância: {maior_distancia} | Tempo: {fim - inicio:.5f}s")
 
     
 # Menu
