@@ -22,7 +22,7 @@ sapos conseguem ficar.
 - [x] pelo menos 5 testes com tempo de execução
 
 ### Extras do enunciado
-- [ ] mais de 2 sapos
+- [x] mais de 2 sapos
 - [ ] custo de salto
 - [x] deixar descer um pouco (tolerância)
 - [x] interface gráfica 
