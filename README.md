@@ -24,7 +24,7 @@ sapos conseguem ficar.
 ### Extras do enunciado
 - [ ] mais de 2 sapos
 - [ ] custo de salto
-- [ ] deixar descer um pouco (tolerância)
+- [x] deixar descer um pouco (tolerância)
 - [x] interface gráfica 
 
 ### Extras por iniciativa própria
