@@ -9,27 +9,26 @@ Created on Sat Mar 21 18:35:05 2026
 import time
 import pandas as pd
 import matplotlib.pyplot as plt
-from tqdm import tqdm # barra de progresso para visualizar teste da questão "10⁵ blocos?"
 
 
 # Funções
-def avancar_direita(blocos, inicio):
+def avancar_direita(blocos, inicio, tolerancia = 0):  # tolerancia permite descer até X unidades (utilizador escolhe)
     posicao = inicio # copia o valor de inicio para posicao
     # só avança se existir um bloco à frente e se esse bloco for acessível
-    while posicao + 1 < len(blocos) and blocos[posicao + 1] >= blocos[posicao]:
+    while posicao + 1 < len(blocos) and blocos[posicao + 1] >= blocos[posicao] - tolerancia:
         posicao = posicao + 1
     return posicao
 
 
-def avancar_esquerda(blocos, inicio):
+def avancar_esquerda(blocos, inicio, tolerancia = 0):
     posicao = inicio 
     # while para a esquerda
-    while posicao -1 >= 0 and blocos[posicao - 1] >= blocos[posicao]:
+    while posicao -1 >= 0 and blocos[posicao - 1] >= blocos[posicao] - tolerancia:
         posicao = posicao - 1
     return posicao
 
-
-def solucao(blocos):
+# tolerancia = 0 implementada como parâmetro e não variável global para evitar problemas de scope
+def solucao(blocos, tolerancia = 0):
     
     # protecção para lista vazia — retorna 0 em vez de crashar
     if len(blocos) == 0:
@@ -41,7 +40,7 @@ def solucao(blocos):
     esquerda = [0] * n
     esquerda[0] = 0
     for i in range(1, n):
-        if blocos[i - 1] >= blocos[i]:
+        if blocos[i - 1] >= blocos[i] - tolerancia:
             esquerda[i] = esquerda[i - 1]
         else:
             esquerda[i] = i
@@ -50,7 +49,7 @@ def solucao(blocos):
     direita = [0] * n
     direita[n - 1] = n - 1
     for i in range(n - 2, -1, -1):
-        if blocos[i + 1] >= blocos[i]:
+        if blocos[i + 1] >= blocos[i] - tolerancia:
             direita[i] = direita[i + 1]
         else:
             direita[i] = i
@@ -77,10 +76,10 @@ def classificar_tempo(tempo):
         return "Lento"
     
 # Função para mostrar os sapos coloridos por posição - com objetivode ser reutilizada ao implementar menu
-def mostrar_grafico(blocos):
-    distancia, partida = solucao(blocos)
-    esquerda = avancar_esquerda(blocos, partida)
-    direita  = avancar_direita(blocos, partida)
+def mostrar_grafico(blocos, tolerancia = 0):
+    distancia, partida = solucao(blocos, tolerancia)
+    esquerda = avancar_esquerda(blocos, partida, tolerancia)
+    direita  = avancar_direita(blocos, partida, tolerancia)
     
     # cores para identificar visualmente as posições do sapo no gráfico
     cores = ["gray"] * len(blocos)
@@ -160,6 +159,7 @@ def menu():
         print("  1) Inserir blocos                   ")
         print("  2) Correr testes                    ")
         print("  3) Mostrar gráfico                  ")
+        print("  4) Tolerância (saltos configuráveis) ")
         print("  0) Sair                             ")
         print("\n" )
 
@@ -177,7 +177,15 @@ def menu():
         elif escolha == "3":
             blocos = ler_blocos()
             mostrar_grafico(blocos)
-            print("\n" )   
+            print("\n" )  
+            
+        elif escolha == "4":
+            blocos = ler_blocos()
+            tolerancia = int(input("Tolerância (0 = regras originais): "))
+            distancia, partida = solucao(blocos, tolerancia)
+            print(f"\nCom tolerância {tolerancia}:")
+            print(f"Distância: {distancia} | Partida: bloco {partida}")  
+            mostrar_grafico(blocos, tolerancia)
 
         elif escolha == "0":
             print("Até logo! 🐸")
