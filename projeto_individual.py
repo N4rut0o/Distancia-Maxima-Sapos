@@ -67,6 +67,21 @@ def solucao(blocos, tolerancia = 0):
     
     return maior_distancia, partida
 
+def solucao_n_sapos(blocos, n_sapos, tolerancia=0):
+    
+    # obtém o bloco de partida e o intervalo
+    distancia, partida = solucao(blocos, tolerancia)
+    pos_esq = avancar_esquerda(blocos, partida, tolerancia)
+    pos_dir = avancar_direita(blocos, partida, tolerancia)
+    
+    # calcula as posições dos N sapos de forma a ficarem igualmente espaçados no intervalo, utilizando o round
+    posicoes = []
+    for num_sapo in range(n_sapos): # num_sapos em vez de apenas um "n" porque já uso n em solucao() 
+        p = round(pos_esq + num_sapo * (pos_dir - pos_esq) / (n_sapos - 1)) # p é variável temporária que fica com a posição de cada sapo
+        posicoes.append(p)
+    
+    return distancia, partida, posicoes
+
 def classificar_tempo(tempo):
     if tempo < 0.000004:
         return "Rápido"
@@ -159,7 +174,8 @@ def menu():
         print("  1) Inserir blocos                   ")
         print("  2) Correr testes                    ")
         print("  3) Mostrar gráfico                  ")
-        print("  4) Tolerância (saltos configuráveis) ")
+        print("  4) Tolerância (saltos configuráveis) ")        
+        print("  5) Adicionar Sapos ")   
         print("  0) Sair                             ")
         print("\n" )
 
@@ -186,6 +202,13 @@ def menu():
             print(f"\nCom tolerância {tolerancia}:")
             print(f"Distância: {distancia} | Partida: bloco {partida}")  
             mostrar_grafico(blocos, tolerancia)
+            
+        elif escolha == "5":
+            blocos = ler_blocos()
+            n_sapos = int(input("Quantos sapos? (mínimo 2): "))
+            tolerancia = int(input("Tolerância (0 = regras originais): "))
+            distancia, partida, posicoes = solucao_n_sapos(blocos, n_sapos, tolerancia)
+            print(f"\n{n_sapos} sapos | Distância: {distancia} | Posições: {posicoes}")    
 
         elif escolha == "0":
             print("Até logo! 🐸")
