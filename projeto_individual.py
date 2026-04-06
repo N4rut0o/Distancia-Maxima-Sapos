@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 
 # Funções
-def avancar_direita(blocos, inicio, tolerancia = 0):  # tolerancia permite descer até X unidades (utilizador escolhe)
+def avancar_direita(blocos,inicio,tolerancia=0):  # tolerancia permite descer até X unidades (utilizador escolhe)
     posicao = inicio # copia o valor de inicio para posicao
     # só avança se existir um bloco à frente e se esse bloco for acessível
     while posicao + 1 < len(blocos) and blocos[posicao + 1] >= blocos[posicao] - tolerancia:
@@ -20,15 +20,15 @@ def avancar_direita(blocos, inicio, tolerancia = 0):  # tolerancia permite desce
     return posicao
 
 
-def avancar_esquerda(blocos, inicio, tolerancia = 0):
+def avancar_esquerda(blocos,inicio,tolerancia=0):
     posicao = inicio 
     # while para a esquerda
-    while posicao -1 >= 0 and blocos[posicao - 1] >= blocos[posicao] - tolerancia:
+    while posicao - 1 >= 0 and blocos[posicao - 1] >= blocos[posicao] - tolerancia:
         posicao = posicao - 1
     return posicao
 
 # tolerancia = 0 implementada como parâmetro e não variável global para evitar problemas de scope
-def solucao(blocos, tolerancia = 0):
+def solucao(blocos,tolerancia=0):
     
     # protecção para lista vazia — retorna 0 em vez de crashar
     if len(blocos) == 0:
@@ -67,7 +67,7 @@ def solucao(blocos, tolerancia = 0):
     
     return maior_distancia, partida
 
-def solucao_n_sapos(blocos, n_sapos, tolerancia=0):
+def solucao_n_sapos(blocos,n_sapos,tolerancia=0):
     
     # obtém o bloco de partida e o intervalo
     distancia, partida = solucao(blocos, tolerancia)
@@ -94,23 +94,57 @@ def classificar_tempo(tempo):
     else:
         return "Lento"
     
-# Função para mostrar os sapos coloridos por posição - com objetivode ser reutilizada ao implementar menu
-def mostrar_grafico(blocos, tolerancia = 0):
+# Função para mostrar os sapos coloridos por posição - com objetivo de ser reutilizada ao implementar menu
+def mostrar_grafico(blocos,tolerancia=0):
+    
+    if len(blocos) == 0:
+        print("Não é possível mostrar gráfico para uma lista vazia.")
+        return
+    
     distancia, partida = solucao(blocos, tolerancia)
     esquerda = avancar_esquerda(blocos, partida, tolerancia)
-    direita  = avancar_direita(blocos, partida, tolerancia)
+    direita = avancar_direita(blocos, partida, tolerancia)
     
-    # cores para identificar visualmente as posições do sapo no gráfico
-    cores = ["gray"] * len(blocos)
-    cores[esquerda] = "green"   
-    cores[partida]  = "blue"    
-    cores[direita]  = "red"     
-
-    pd.Series(blocos).plot(kind="bar", color=cores)
-    plt.title(f"Blocos: {blocos} | Distância: {distancia}")
-    plt.xlabel("Posição")
-    plt.ylabel("Altura")
-    plt.show()  
+    # lista preparada para futura adaptação a N sapos
+    posicoes = [esquerda, partida, direita]
+    
+    # cores associadas a cada posição
+    cores_posicoes = ["green", "blue", "red"]
+    
+    # cores base de todas as barras
+    cores = ["lightgray"] * len(blocos)
+    
+    # contar quantas vezes cada posição aparece, adaptada para quando tiver N sapos
+    contagem = {}
+    for posicao in posicoes:
+        contagem[posicao] = contagem.get(posicao, 0) + 1
+    
+    # atribuir cor normal ou cor de sobreposição
+    for i in range(len(posicoes)):
+        posicao = posicoes[i]
+        
+        if contagem[posicao] > 1:
+            cores[posicao] = "gold"
+        else:
+            cores[posicao] = cores_posicoes[i]
+    
+    plt.style.use("seaborn-v0_8")
+    plt.figure(figsize=(10, 5))
+    
+    ax = pd.Series(blocos).plot(kind="bar", color=cores)
+    ax.set_title(f"Problema dos Sapos | Distância: {distancia}")
+    ax.set_xlabel("Posição do bloco")
+    ax.set_ylabel("Altura do bloco")
+    
+    # cores para identificar visualmente a posição do sapo mais à esquerda, o bloco de partida e a posição do sapo mais à direita
+    plt.bar(0, 0, color="green", label="Sapo Esquerda")
+    plt.bar(0, 0, color="blue", label="Bloco de partida")
+    plt.bar(0, 0, color="red", label="Sapo Direita")
+    plt.bar(0, 0, color="gold", label="Posição coincidente") # quando sapos ficam no mesmo bloco / sapo fica no mesmo bloco que partida
+    
+    plt.tight_layout()
+    plt.legend()
+    plt.show()
     
 def ler_blocos():
     resposta = input("Introduza os blocos: ")
@@ -238,7 +272,12 @@ print(f"2 blocos iguais: distância {distancia}")
 
 distancia, partida = solucao([]) # lista vazia — não deveria crashar 
 print(f"lista vazia: distância {distancia}")
-      
+
+# Testes de cores gráficos
+mostrar_grafico([2,6,8,5])
+mostrar_grafico([1,5,5,2,6])
+mostrar_grafico([1])
+
 # Chamar função Menu para utilizador usar
 menu()
 
