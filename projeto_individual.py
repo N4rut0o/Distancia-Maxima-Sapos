@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
 """
-Created on Sat Mar 21 18:35:05 2026
-
-@author: Filipe
+Projeto Individual — Problema dos Sapos
+Laboratórios de Estatística II — Licenciatura em Estatística Aplicada
+Ano Letivo 2025/2026
+Autor: Luís Filipe Gonçalves
 """
 
 # Imports
@@ -74,6 +74,10 @@ def solucao_n_sapos(blocos, n_sapos, tolerancia=0):
     pos_esq = avancar_esquerda(blocos, partida, tolerancia)
     pos_dir = avancar_direita(blocos, partida, tolerancia)
     
+    # a distância entre um sapo e ele próprio é sempre 0 e evitar crash se utilizador colocar 1
+    if n_sapos == 1:
+        return distancia, partida, [partida]
+    
     # calcula as posições dos N sapos de forma a ficarem igualmente espaçados no intervalo, utilizando o round
     posicoes = []
     for num_sapo in range(n_sapos): # num_sapos em vez de apenas um "n" porque já uso n em solucao() 
@@ -126,8 +130,8 @@ def correr_testes():
             ]
 
     # Lista para guardar os resultados de cada teste
-    resultados = []  # lista para guardar os resultados de cada teste
-
+    resultados = []  
+    
     # Executa cada teste e compara com o valor esperado
     for blocos, valor_esperado in testes:
         
@@ -157,7 +161,7 @@ def correr_testes():
     print(df_resultados)
     
     # teste com lista grande para responder à questão do enunciado "o que aconteceria com uma lista de 10⁵ blocos?"
-    print("\\n")
+    print("\n")
     blocos_grandes = list(range(1, 100001))
     inicio = time.perf_counter()
     distancia, partida = solucao(blocos_grandes)
@@ -185,7 +189,7 @@ def menu():
             blocos = ler_blocos()
             distancia, partida = solucao(blocos)
             print(f"\nDistância: {distancia} | Partida: bloco {partida}")
-            print("\n" )   
+            print("\n")   
 
         elif escolha == "2":
             correr_testes()
@@ -193,7 +197,7 @@ def menu():
         elif escolha == "3":
             blocos = ler_blocos()
             mostrar_grafico(blocos)
-            print("\n" )  
+            print("\n")  
             
         elif escolha == "4":
             blocos = ler_blocos()
