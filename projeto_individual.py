@@ -9,6 +9,7 @@ Autor: Luís Filipe Gonçalves
 import time
 import pandas as pd
 import matplotlib.pyplot as plt
+plt.style.use("seaborn-v0_8")
 
 
 # Funções
@@ -94,56 +95,100 @@ def classificar_tempo(tempo):
     else:
         return "Lento"
     
-# Função para mostrar os sapos coloridos por posição - com objetivo de ser reutilizada ao implementar menu
-def mostrar_grafico(blocos,tolerancia=0):
-    
+# Função para mostrar os sapos coloridos por posição - com objetivo de ser reutilizada ao implementar menu / n_sapos = 2 porque é o utilizado por defeito
+def mostrar_grafico(blocos,tolerancia=0,n_sapos=2):
+     
     if len(blocos) == 0:
         print("Não é possível mostrar gráfico para uma lista vazia.")
         return
     
-    distancia, partida = solucao(blocos, tolerancia)
-    esquerda = avancar_esquerda(blocos, partida, tolerancia)
-    direita = avancar_direita(blocos, partida, tolerancia)
+    # obtém posições consoante o número de sapos
+    if n_sapos == 2:
+        distancia, partida = solucao(blocos, tolerancia)
+        esquerda = avancar_esquerda(blocos, partida, tolerancia)
+        direita = avancar_direita(blocos, partida, tolerancia)
+        posicoes = [esquerda, direita]
+    else:
+        distancia, partida, posicoes = solucao_n_sapos(blocos, n_sapos, tolerancia)
     
-    # lista preparada para futura adaptação a N sapos
-    posicoes = [esquerda, partida, direita]
+    # gera uma cor diferente para cada sapo
+    # sapo 1 sempre verde, sapo último sempre vermelho, meio gerado automaticamente
+    def gerar_cores_sapos(n):
+        if n == 1:
+            return ["green"]
+        if n == 2:
+            return ["green", "red"]
+        import matplotlib.cm as cm
+        mapa = cm.get_cmap("tab10", n)
+        cores_geradas = ["green"]
+        for i in range(1, n - 1):
+            r, g, b, _ = mapa(i)
+            cores_geradas.append(f"#{int(r*255):02x}{int(g*255):02x}{int(b*255):02x}")
+        cores_geradas.append("red")
+        return cores_geradas
     
-    # cores associadas a cada posição
-    cores_posicoes = ["green", "blue", "red"]
+    cores_sapos = gerar_cores_sapos(len(posicoes))
     
     # cores base de todas as barras
     cores = ["lightgray"] * len(blocos)
+    cores[partida] = "blue"
     
     # contar quantas vezes cada posição aparece, adaptada para quando tiver N sapos
     contagem = {}
-    for posicao in posicoes:
-        contagem[posicao] = contagem.get(posicao, 0) + 1
+    for pos in posicoes:
+        contagem[pos] = contagem.get(pos, 0) + 1
     
     # atribuir cor normal ou cor de sobreposição
-    for i in range(len(posicoes)):
-        posicao = posicoes[i]
-        
-        if contagem[posicao] > 1:
-            cores[posicao] = "gold"
+    for idx, pos in enumerate(posicoes):
+        if pos == partida or contagem[pos] > 1:
+            cores[pos] = "gold"  # quando sapos ficam no mesmo bloco / sapo fica no mesmo bloco que partida
         else:
-            cores[posicao] = cores_posicoes[i]
+            cores[pos] = cores_sapos[idx]
     
-    plt.style.use("seaborn-v0_8")
     plt.figure(figsize=(10, 5))
+    ax = pd.Series(blocos).plot(kind="bar", color=cores, rot=0)
     
-    ax = pd.Series(blocos).plot(kind="bar", color=cores)
-    ax.set_title(f"Problema dos Sapos | Distância: {distancia}")
+    # valor dentro de cada barra — preto em cinzentas e gold, branco nas restantes
+    for i, v in enumerate(blocos):
+        cor_texto = "black" if cores[i] in ["lightgray", "gold"] else "white"
+        ax.text(i, v / 2, str(v), ha="center", va="center",
+                color=cor_texto, fontsize=9, fontweight="bold")
+    
+    # seta de distância entre sapo mais à esquerda e mais à direita
+    if posicoes[0] != posicoes[-1]:
+        y_seta = -max(blocos) * 0.12
+        ax.annotate("",
+            xy=(posicoes[-1], y_seta),
+            xytext=(posicoes[0], y_seta),
+            arrowprops=dict(arrowstyle="<->", color="black", lw=1.5))
+        ax.text((posicoes[0] + posicoes[-1]) / 2, y_seta - max(blocos) * 0.08,
+                f"distância = {distancia}",
+                ha="center", fontsize=9, fontweight="bold")
+        ax.set_ylim(-max(blocos) * 0.28, max(blocos) * 1.15)
+    else:
+        ax.set_ylim(0, max(blocos) * 1.15)
+    
+    # título com partida, tolerância e nº sapos
+    tol_str = f" | Tolerância: {tolerancia}" if tolerancia > 0 else ""
+    ax.set_title(f"Problema dos Sapos | Partida: bloco {partida} | Distância: {distancia} | {n_sapos} sapos{tol_str}")
     ax.set_xlabel("Posição do bloco")
     ax.set_ylabel("Altura do bloco")
     
-    # cores para identificar visualmente a posição do sapo mais à esquerda, o bloco de partida e a posição do sapo mais à direita
-    plt.bar(0, 0, color="green", label="Sapo Esquerda")
-    plt.bar(0, 0, color="blue", label="Bloco de partida")
-    plt.bar(0, 0, color="red", label="Sapo Direita")
-    plt.bar(0, 0, color="gold", label="Posição coincidente") # quando sapos ficam no mesmo bloco / sapo fica no mesmo bloco que partida
+    # cores para identificar visualmente a posição de cada sapo, o bloco de partida e posições coincidentes
+    legendas = []
+    for idx, pos in enumerate(posicoes):
+        if pos == partida or contagem[pos] > 1:
+            legendas.append(plt.Rectangle((0,0),1,1, color="gold",
+                label=f"Sapo {idx+1} — bloco {pos} (coincide com partida)"))
+        else:
+            legendas.append(plt.Rectangle((0,0),1,1, color=cores_sapos[idx],
+                label=f"Sapo {idx+1} — bloco {pos}"))
     
+    legendas.append(plt.Rectangle((0,0),1,1, color="blue",
+        label=f"Partida — bloco {partida}"))
+    
+    plt.legend(handles=legendas, loc="upper right")
     plt.tight_layout()
-    plt.legend()
     plt.show()
     
 def ler_blocos():
@@ -247,6 +292,7 @@ def menu():
             tolerancia = int(input("Tolerância (0 = regras originais): "))
             distancia, partida, posicoes = solucao_n_sapos(blocos, n_sapos, tolerancia)
             print(f"\n{n_sapos} sapos | Distância: {distancia} | Posições: {posicoes}")    
+            mostrar_grafico(blocos, tolerancia, n_sapos)
 
         elif escolha == "0":
             print("Até logo! 🐸")
