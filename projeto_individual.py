@@ -76,7 +76,7 @@ def solucao_n_sapos(blocos,n_sapos,tolerancia=0):
     pos_dir = avancar_direita(blocos, partida, tolerancia)
     
     # a distância entre um sapo e ele próprio é sempre 0 e evitar crash se utilizador colocar 1
-    if n_sapos == 1:
+    if n_sapos <= 1:  # em vez de n_sapos == 1 como estava antes porque crashava com 0.
         return distancia, partida, [partida]
     
     # calcula as posições dos N sapos de forma a ficarem igualmente espaçados no intervalo, utilizando o round
@@ -102,6 +102,9 @@ def mostrar_grafico(blocos,tolerancia=0,n_sapos=2):
         print("Não é possível mostrar gráfico para uma lista vazia.")
         return
     
+    # criado para "corrigir" um warning e erro visual no eixo Y 
+    altura_max = max(blocos) if max(blocos) > 0 else 1
+    
     # obtém posições consoante o número de sapos
     if n_sapos == 2:
         distancia, partida = solucao(blocos, tolerancia)
@@ -110,6 +113,11 @@ def mostrar_grafico(blocos,tolerancia=0,n_sapos=2):
         posicoes = [esquerda, direita]
     else:
         distancia, partida, posicoes = solucao_n_sapos(blocos, n_sapos, tolerancia)
+     
+    # proteger contra lista de posições vazia (ex: n_sapos=0)    
+    if len(posicoes) == 0:
+        print("Sem posições de sapos para mostrar.")
+        return    
     
     # gera uma cor diferente para cada sapo
     # sapo 1 sempre verde, sapo último sempre vermelho, meio gerado automaticamente
@@ -118,8 +126,7 @@ def mostrar_grafico(blocos,tolerancia=0,n_sapos=2):
             return ["green"]
         if n == 2:
             return ["green", "red"]
-        import matplotlib.cm as cm
-        mapa = cm.get_cmap("tab10", n)
+        mapa = plt.colormaps.get_cmap("tab10").resampled(n)
         cores_geradas = ["green"]
         for i in range(1, n - 1):
             r, g, b, _ = mapa(i)
@@ -156,17 +163,17 @@ def mostrar_grafico(blocos,tolerancia=0,n_sapos=2):
     
     # seta de distância entre sapo mais à esquerda e mais à direita
     if posicoes[0] != posicoes[-1]:
-        y_seta = -max(blocos) * 0.12
+        y_seta = -altura_max * 0.12 # utilizado - altura_max para que a seta aparecesse debaixo abaixo das barras/zona negativa do eixo y
         ax.annotate("",
             xy=(posicoes[-1], y_seta),
             xytext=(posicoes[0], y_seta),
             arrowprops=dict(arrowstyle="<->", color="black", lw=1.5))
-        ax.text((posicoes[0] + posicoes[-1]) / 2, y_seta - max(blocos) * 0.08,
+        ax.text((posicoes[0] + posicoes[-1]) / 2, y_seta -altura_max * 0.08,
                 f"distância = {distancia}",
                 ha="center", fontsize=9, fontweight="bold")
-        ax.set_ylim(-max(blocos) * 0.28, max(blocos) * 1.15)
+        ax.set_ylim(-altura_max * 0.28, altura_max * 1.15)
     else:
-        ax.set_ylim(0, max(blocos) * 1.15)
+        ax.set_ylim(0, altura_max * 1.15)
     
     # título com partida, tolerância e nº sapos
     tol_str = f" | Tolerância: {tolerancia}" if tolerancia > 0 else ""
@@ -192,9 +199,32 @@ def mostrar_grafico(blocos,tolerancia=0,n_sapos=2):
     plt.show()
     
 def ler_blocos():
-    resposta = input("Introduza os blocos: ")
-    blocos = list(map(int, resposta.split()))
-    return blocos 
+    # continua a pedir até o utilizador introduzir valores válidos 
+    while True:
+        try:
+            resposta = input("Introduza os blocos separados por espaço: ").strip()
+            if not resposta:
+                print("Lista vazia — introduza pelo menos um bloco.")
+                continue
+            blocos = [int(x) for x in resposta.split()]
+            if any(b < 0 for b in blocos):
+                print("As alturas têm de ser números positivos ou 0.")
+                continue
+            return blocos
+        except ValueError:
+            print("Valores inválidos — utilize só números inteiros separados por espaço.")
+            
+def ler_inteiro(mensagem):
+    # pede um número inteiro não negativo
+    while True:
+        try:
+            valor = int(input(mensagem))
+            if valor < 0:
+                print("Introduz um valor não negativo.")
+                continue
+            return valor
+        except ValueError: # utilizado para letras, decimais e outros valores inválidos
+            print("Tem de ser um número inteiro.")            
 
 # código movido para uma função para ser utilizado através do Menu
 def correr_testes():
@@ -280,7 +310,7 @@ def menu():
             
         elif escolha == "4":
             blocos = ler_blocos()
-            tolerancia = int(input("Tolerância (0 = regras originais): "))
+            tolerancia = ler_inteiro("Tolerância (0 = regras originais): ")
             distancia, partida = solucao(blocos, tolerancia)
             print(f"\nCom tolerância {tolerancia}:")
             print(f"Distância: {distancia} | Partida: bloco {partida}")  
@@ -288,8 +318,8 @@ def menu():
             
         elif escolha == "5":
             blocos = ler_blocos()
-            n_sapos = int(input("Quantos sapos? (mínimo 2): "))
-            tolerancia = int(input("Tolerância (0 = regras originais): "))
+            n_sapos = ler_inteiro("Quantos sapos? (mínimo 2): ")
+            tolerancia = ler_inteiro("Tolerância (0 = regras originais): ")
             distancia, partida, posicoes = solucao_n_sapos(blocos, n_sapos, tolerancia)
             print(f"\n{n_sapos} sapos | Distância: {distancia} | Posições: {posicoes}")    
             mostrar_grafico(blocos, tolerancia, n_sapos)
@@ -323,6 +353,17 @@ print(f"lista vazia: distância {distancia}")
 mostrar_grafico([2,6,8,5])
 mostrar_grafico([1,5,5,2,6])
 mostrar_grafico([1])
+
+# Testes de validação
+mostrar_grafico([0, 0, 0, 0]) # fix altura_max — antes dava UserWarning no eixo Y
+mostrar_grafico([2,6,8,5], n_sapos=0)  # fix n_sapos<=1 — antes dava IndexError
+mostrar_grafico([2,6,8,5], tolerancia=1, n_sapos=5)  # testa N sapos com tolerância
+distancia, partida = solucao([]) # lista vazia — não deveria crashar 
+print(f"lista vazia: distância {distancia}")
+distancia, partida = solucao([0, 0, 0, 0]) # testa todos os blocos a zero — valida fix de altura_max
+print(f"todos zeros: distância {distancia}") 
+distancia, partida, posicoes = solucao_n_sapos([2,6,8,5], n_sapos=0) # testa n_sapos=0 — valida fix do <= 1 em solucao_n_sapos (antes crashava com 0)
+print(f"n_sapos=0: posições={posicoes}")
 
 # Chamar função Menu para utilizador usar
 menu()
