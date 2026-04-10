@@ -106,13 +106,7 @@ def mostrar_grafico(blocos,tolerancia=0,n_sapos=2):
     altura_max = max(blocos) if max(blocos) > 0 else 1
     
     # obtém posições consoante o número de sapos
-    if n_sapos == 2:
-        distancia, partida = solucao(blocos, tolerancia)
-        esquerda = avancar_esquerda(blocos, partida, tolerancia)
-        direita = avancar_direita(blocos, partida, tolerancia)
-        posicoes = [esquerda, direita]
-    else:
-        distancia, partida, posicoes = solucao_n_sapos(blocos, n_sapos, tolerancia)
+    distancia, partida, posicoes = solucao_n_sapos(blocos, n_sapos, tolerancia)
      
     # proteger contra lista de posições vazia (ex: n_sapos=0)    
     if len(posicoes) == 0:
