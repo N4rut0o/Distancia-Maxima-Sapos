@@ -10,8 +10,10 @@ import time
 import pandas as pd
 import matplotlib.pyplot as plt
 plt.style.use("seaborn-v0_8")
+from comparacao_desempenho import executar_comparacao
 
 
+        
 # Funções
 def avancar_direita(blocos,inicio,tolerancia=0):  # tolerancia permite descer até X unidades (utilizador escolhe)
     posicao = inicio # copia o valor de inicio para posicao
@@ -277,22 +279,22 @@ def menu():
     
     while True:
         print("        -- PROBLEMA DOS SAPOS --          ")
-        print("             --- Base ---             ")
+        print("              --- Base ---             ")
         print("  1) Inserir blocos                   ")
-        print("  2) Correr testes                    ")
+        print("  2) Correr testes                     ")
         print("  3) Mostrar gráfico                  ")
         print("  4) Tolerância (saltos configuráveis) ")        
-        print("  5) Adicionar Sapos ")   
+        print("  5) Adicionar Sapos                   ")   
+        print("  6) Análise de Performance (8 min)    ") 
         print("  0) Sair                             ")
-        print("\n" )
+        print("\n")
 
         escolha = input("Opção: ").strip()
 
         if escolha == "1":
             blocos = ler_blocos()
             distancia, partida = solucao(blocos)
-            print(f"\nDistância: {distancia} | Partida: bloco {partida}")
-            print("\n")   
+            print(f"\nDistância: {distancia} | Partida: bloco {partida}\n")   
 
         elif escolha == "2":
             correr_testes()
@@ -317,48 +319,17 @@ def menu():
             distancia, partida, posicoes = solucao_n_sapos(blocos, n_sapos, tolerancia)
             print(f"\n{n_sapos} sapos | Distância: {distancia} | Posições: {posicoes}")    
             mostrar_grafico(blocos, tolerancia, n_sapos)
+        
+        elif escolha == "6":
+            executar_comparacao() # Chama a função do outro ficheiro
 
         elif escolha == "0":
             print("Até logo! 🐸")
-            break
+            break 
 
         else:
-            print("Opção inválida.")
+            print("Opção inválida. Tenta novamente.")
             
-
-# Testes
-
-# bloco inicial dado
-blocos = [2,6,8,5] 
-distancia, partida = solucao(blocos)
-print(f"Distância: {distancia} | Partida: bloco {partida}")
-
-# testes de casos limite para verificar se programa não crasha
-distancia, partida = solucao([1])  # um único bloco, ou seja, o sapo não se pode mover
-print(f"1 bloco: distância {distancia}") 
-
-distancia, partida = solucao([1, 1]) # dois blocos iguais, conseguem separar-se 1 posição
-print(f"2 blocos iguais: distância {distancia}")
-
-distancia, partida = solucao([]) # lista vazia — não deveria crashar 
-print(f"lista vazia: distância {distancia}")
-
-# Testes de cores gráficos
-mostrar_grafico([2,6,8,5])
-mostrar_grafico([1,5,5,2,6])
-mostrar_grafico([1])
-
-# Testes de validação
-mostrar_grafico([0, 0, 0, 0]) # fix altura_max — antes dava UserWarning no eixo Y
-mostrar_grafico([2,6,8,5], n_sapos=0)  # fix n_sapos<=1 — antes dava IndexError
-mostrar_grafico([2,6,8,5], tolerancia=1, n_sapos=5)  # testa N sapos com tolerância
-distancia, partida = solucao([]) # lista vazia — não deveria crashar 
-print(f"lista vazia: distância {distancia}")
-distancia, partida = solucao([0, 0, 0, 0]) # testa todos os blocos a zero — valida fix de altura_max
-print(f"todos zeros: distância {distancia}") 
-distancia, partida, posicoes = solucao_n_sapos([2,6,8,5], n_sapos=0) # testa n_sapos=0 — valida fix do <= 1 em solucao_n_sapos (antes crashava com 0)
-print(f"n_sapos=0: posições={posicoes}")
-
 # Chamar função Menu para utilizador usar
 menu()
 
