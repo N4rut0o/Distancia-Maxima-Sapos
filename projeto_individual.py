@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 plt.style.use("seaborn-v0_8")
 from comparacao_desempenho import executar_comparacao
 
-
         
 # Funções
 def avancar_direita(blocos,inicio,tolerancia=0):  # tolerancia permite descer até X unidades (utilizador escolhe)
@@ -329,7 +328,8 @@ def menu():
 
         else:
             print("Opção inválida. Tenta novamente.")
-            
-# Chamar função Menu para utilizador usar
-menu()
+  
+# necessário para evitar que o menu corra quando o ficheiro é importado noutro módulo
+if __name__ == "__main__":
+    menu()
 
