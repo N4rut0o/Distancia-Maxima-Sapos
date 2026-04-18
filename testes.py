@@ -3,84 +3,112 @@ Testes do Projeto Individual — Problema dos Sapos
 Ficheiro separado para manter o código principal limpo
 """
 
-from projeto_individual import solucao, solucao_n_sapos, mostrar_grafico, classificar_tempo
 import time
+import unittest
 import pandas as pd
-import random
+
+from projeto_individual import solucao, solucao_n_sapos, classificar_tempo
 
 
-# foi necessário para evitar que o Python execute o menu de projeto_individual.py ao importá-lo
-if __name__ == "__main__":
+class TestProblemaSapos(unittest.TestCase):
+    def test_exemplo_1(self):
+        self.assertEqual(solucao([2, 6, 8, 5]), (2, 1))
 
-    # testes com valor esperado — 2 blocos dados do enunciado + outros casos
+    def test_exemplo_2(self):
+        self.assertEqual(solucao([1, 5, 5, 2, 6]), (3, 1))
+
+    def test_lista_vazia(self):
+        self.assertEqual(solucao([]), (0, 0))
+
+    def test_um_bloco(self):
+        self.assertEqual(solucao([7]), (0, 0))
+
+    def test_todos_iguais(self):
+        self.assertEqual(solucao([4, 4, 4, 4]), (3, 0))
+
+    def test_crescente(self):
+        self.assertEqual(solucao([1, 2, 3, 4, 5]), (4, 0))
+
+    def test_decrescente(self):
+        self.assertEqual(solucao([5, 4, 3, 2, 1]), (4, 4))
+
+    def test_com_tolerancia(self):
+        # com tolerância 1, o sapo consegue descer 1 unidade
+        self.assertEqual(solucao([5, 4, 3, 2, 1], tolerancia=1), (4, 0))
+
+    def test_n_sapos_base(self):
+        distancia, partida, posicoes = solucao_n_sapos([1, 5, 5, 2, 6], 2)
+        self.assertEqual(distancia, 3)
+        self.assertEqual(partida, 1)
+        self.assertEqual(posicoes, [1, 4])
+
+    def test_n_sapos_varios(self):
+        distancia, partida, posicoes = solucao_n_sapos([1, 5, 5, 2, 6], 4)
+        self.assertEqual(distancia, 3)
+        self.assertEqual(partida, 1)
+        self.assertEqual(posicoes, [1, 2, 3, 4])
+
+    def test_n_sapos_um(self):
+        distancia, partida, posicoes = solucao_n_sapos([2, 6, 8, 5], 1)
+        self.assertEqual(distancia, 2)
+        self.assertEqual(partida, 1)
+        self.assertEqual(posicoes, [1])
+
+    def test_classificar_tempo(self):
+        self.assertEqual(classificar_tempo(0.000003), "Rápido")
+        self.assertEqual(classificar_tempo(0.0000045), "Normal")
+        self.assertEqual(classificar_tempo(0.00001), "Lento")
+
+
+def demonstracao_resultados():
     testes = [
-        ([2, 6, 8, 5],    2, 0, "exemplo 1 do enunciado"),
-        ([1, 5, 5, 2, 6], 3, 0, "exemplo 2 do enunciado"),
-        ([1, 1, 1, 1],    3, 0, "todos os blocos iguais"),
-        ([5, 4, 3, 2, 1], 4, 0, "alturas sempre a descer"),      
-        ([5, 4, 3, 2, 1], 4, 1, "alturas a descer com tolerância 1"),
-        ([1, 2, 3, 4, 5], 4, 0, "alturas sempre a subir"),
-        ([1],             0, 0, "um único bloco"),
-        ([],              0, 0, "lista vazia"),
+        {"nome": "Exemplo 1", "blocos": [2, 6, 8, 5], "esperado": 2},
+        {"nome": "Exemplo 2", "blocos": [1, 5, 5, 2, 6], "esperado": 3},
+        {"nome": "Todos iguais", "blocos": [1, 1, 1, 1], "esperado": 3},
+        {"nome": "Decrescente", "blocos": [5, 4, 3, 2, 1], "esperado": 4},
+        {"nome": "Crescente", "blocos": [1, 2, 3, 4, 5], "esperado": 4},
     ]
 
     resultados = []
 
-    # Executa cada teste e compara com o valor esperado
-    for blocos, valor_esperado, tolerancia, nome in testes:
-
-        inicio = time.perf_counter() 
-        distancia, partida = solucao(blocos, tolerancia)
+    for teste in testes:
+        inicio = time.perf_counter()
+        distancia, partida = solucao(teste["blocos"])
         fim = time.perf_counter()
-        tempo_execucao = fim - inicio  
+        tempo_execucao = fim - inicio
 
-        print(f"Blocos: {blocos}")
-        print(f"Distância: {distancia}")
-        print(f"Valor esperado: {valor_esperado}")
-        print(f"tempo: {tempo_execucao:.5f}s")
-
-        # guarda os resultados do teste atual
         resultados.append({
-            "blocos"        : str(blocos),
-            "distancia"     : distancia,
-            "valor_esperado": valor_esperado,
-            "correto"       : distancia == valor_esperado,
-            "tempo"         : tempo_execucao
+            "teste": teste["nome"],
+            "blocos": str(teste["blocos"]),
+            "distancia": distancia,
+            "partida": partida,
+            "valor_esperado": teste["esperado"],
+            "correto": distancia == teste["esperado"],
+            "tempo": tempo_execucao,
+            "classificacao": classificar_tempo(tempo_execucao),
         })
 
-    # Análise dos resultados com pandas
-    df_resultados = pd.DataFrame(resultados)
-    df_resultados["classificacao"] = df_resultados["tempo"].apply(classificar_tempo)
-    print(df_resultados)
+    df = pd.DataFrame(resultados)
+    print("\n--- RESULTADOS DOS TESTES ---")
+    print(df)
+
+    print("\n--- TESTE COM 10^5 BLOCOS ---")
+    blocos_grandes = list(range(1, 100001))
+    inicio = time.perf_counter()
+    distancia, partida = solucao(blocos_grandes)
+    fim = time.perf_counter()
+    print(f"Distância: {distancia} | Partida: {partida} | Tempo: {fim - inicio:.5f}s")
 
 
-#  testes de robustez - casos limite para verificar se programa não crasha
-distancia, partida = solucao([1]) 
-print(f"1 bloco: distância {distancia}") 
+if __name__ == "__main__":
+    print("A correr testes automáticos...\n")
+    unittest.main(exit=False)
 
-distancia, partida = solucao([1, 1])
-print(f"2 blocos iguais: distância {distancia}")
+    demonstracao = input("\nQueres ver a tabela de demonstração? (s/n): ").strip().lower()
+    if demonstracao == "s":
+        demonstracao_resultados()
 
-distancia, partida = solucao([])  
-print(f"lista vazia: distância {distancia}")
-
-distancia, _ = solucao([0, 0, 0, 0])
-print(f"todos zeros: distância {distancia}")
-
-distancia, _, posicoes = solucao_n_sapos([2, 6, 8, 5], n_sapos=0)
-print(f"n_sapos=0: posições={posicoes}")
-
-
-# Testes de cores gráficos
-mostrar_grafico([2,6,8,5])
-mostrar_grafico([1,5,5,2,6])
-mostrar_grafico([1])
-mostrar_grafico([0, 0, 0, 0])                          
-mostrar_grafico([2, 6, 8, 5], n_sapos=0)              
-mostrar_grafico([2, 6, 8, 5], tolerancia=1, n_sapos=5) 
-
-
-# TAMANHO_LISTA pode ser alterado / deveria estar no topo como professor mencionou 
+# pode ser alterado / deveria estar no topo como professor mencionou 
 TAMANHO_LISTA = 10 ** 5
  
 # lista aleatória em vez de só crescente — mais representativo de casos reais
